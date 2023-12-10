@@ -29,7 +29,7 @@ class Database:
             self._connection.execute("""
             CREATE TABLE IF NOT EXISTS goods(
                 good_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                good_name TEXT NOT NULL,
+                name TEXT NOT NULL,
                 quantity INTEGER NOT NULL,
                 price REAL NOT NULL, 
                 manufacturer TEXT NOT NULL             
@@ -38,9 +38,8 @@ class Database:
             self._connection.execute("""
             CREATE TABLE IF NOT EXISTS basket(
                 basket_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                in_order BOOL NOT NULL,
+                in_order BOOL default 0,
                 user_id INTEGER NOT NULL,
-                quantity INTEGER NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES users (user_id)                                 
                                      )""")
             
@@ -48,6 +47,7 @@ class Database:
             CREATE TABLE IF NOT EXISTS goods_basket(
                 basket_id INTEGER NOT NULL,
                 good_id INTEGER NOT NULL,
+                quantity INTEGER NOT NULL,
                 UNIQUE(basket_id, good_id),
                 FOREIGN KEY (basket_id) REFERENCES basket_id (basket_id),
                 FOREIGN KEY (good_id) REFERENCES goods (good_id)                     
@@ -61,6 +61,7 @@ class Database:
                 basket_id INTEGER NOT NULL,
                 address TEXT NOT NULL,
                 order_time TEXT NOT NULL,
+                total REAL NOT NULL,
                 FOREIGN KEY (user_id) REFERENCES users (user_id),
                 FOREIGN KEY (basket_id) REFERENCES users (basket_id)                                       
                                      )""")
@@ -89,9 +90,8 @@ class Database:
             ('Адвент-календарь ERBORIAN 10 days', 140 , 7500, 'Республика Корея')
         ]
              
-        self._cursor.execute("SELECT COUNT(*) FROM goods")
+        self._cursor.execute('SELECT COUNT(*) FROM goods')
         if self._cursor.fetchone()[0] == 0:
-            self._cursor.executemany("INSERT INTO goods (good_name, quantity ,price, manufacturer) VALUES (?, ?, ?, ?)",
+            self._cursor.executemany('INSERT INTO goods (name, quantity ,price, manufacturer) VALUES (?, ?, ?, ?)',
                                 goods)
             self._connection.commit()
-            print("На складе сейчас 10 видов товаров!")
